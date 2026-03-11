@@ -1,20 +1,33 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-require('dotenv').config();
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') }); // Explicit path
 
 const User = require('./models/User');
 const Category = require('./models/Category');
 const Tag = require('./models/Tag');
+// Import Edition if needed
+// const Edition = require('./models/Edition');
 
 const seedDatabase = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('MONGODB_URI:', process.env.MONGODB_URI); // Debug line
+    
+    if (!process.env.MONGODB_URI) {
+      throw new Error('MONGODB_URI is not defined in .env file');
+    }
+
+    await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     console.log('Connected to MongoDB');
 
+    // Clear existing data
     await User.deleteMany({});
     await Category.deleteMany({});
     await Tag.deleteMany({});
 
+    // Create admin user
     const admin = await User.create({
       name: 'Super Admin',
       email: 'admin@emaanmall.com',
@@ -24,6 +37,9 @@ const seedDatabase = async () => {
       status: 'Active',
     });
 
+    console.log('Admin created:', admin.email);
+
+    // Create categories
     const categories = await Category.create([
       {
         name: 'Economics',
@@ -47,6 +63,9 @@ const seedDatabase = async () => {
       },
     ]);
 
+    console.log('Categories created:', categories.length);
+
+    // Create tags
     const tags = await Tag.create([
       { name: 'Halal Economy', color: '#A68B5C', createdBy: admin._id },
       { name: 'Finance', color: '#3D8F6F', createdBy: admin._id },
@@ -55,14 +74,16 @@ const seedDatabase = async () => {
       { name: 'Islamic Finance', color: '#9B59B6', createdBy: admin._id },
     ]);
 
-    console.log('Database seeded successfully!');
-    console.log('Admin credentials:');
-    console.log('Email: admin@emaanmall.com');
-    console.log('Password: admin123');
+    console.log('Tags created:', tags.length);
+
+    console.log('\n✅ Database seeded successfully!');
+    console.log('📧 Admin credentials:');
+    console.log('   Email: admin@emaanmall.com');
+    console.log('   Password: admin123');
 
     process.exit(0);
   } catch (error) {
-    console.error('Error seeding database:', error);
+    console.error('❌ Error seeding database:', error.message);
     process.exit(1);
   }
 };

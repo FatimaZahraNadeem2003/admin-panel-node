@@ -68,9 +68,12 @@ const adSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-adSchema.virstual('ctr').get(function() {
+adSchema.virtual('ctr').get(function() {
   if (this.stats.impressions === 0) return '0%';
   return ((this.stats.clicks / this.stats.impressions) * 100).toFixed(1) + '%';
 });
+
+adSchema.set('toJSON', { virtuals: true });
+adSchema.set('toObject', { virtuals: true });
 
 module.exports = mongoose.model('Ad', adSchema);

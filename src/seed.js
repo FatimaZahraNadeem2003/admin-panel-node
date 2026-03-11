@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') }); // Explicit path
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') }); 
 
 const User = require('./models/User');
 const Category = require('./models/Category');
@@ -10,7 +10,7 @@ const Tag = require('./models/Tag');
 
 const seedDatabase = async () => {
   try {
-    console.log('MONGODB_URI:', process.env.MONGODB_URI); // Debug line
+    console.log('MONGODB_URI:', process.env.MONGODB_URI); 
     
     if (!process.env.MONGODB_URI) {
       throw new Error('MONGODB_URI is not defined in .env file');
@@ -22,12 +22,10 @@ const seedDatabase = async () => {
     });
     console.log('Connected to MongoDB');
 
-    // Clear existing data
     await User.deleteMany({});
     await Category.deleteMany({});
     await Tag.deleteMany({});
 
-    // Create admin user
     const admin = await User.create({
       name: 'Super Admin',
       email: 'admin@emaanmall.com',
@@ -39,7 +37,6 @@ const seedDatabase = async () => {
 
     console.log('Admin created:', admin.email);
 
-    // Create categories
     const categories = await Category.create([
       {
         name: 'Economics',
@@ -65,7 +62,6 @@ const seedDatabase = async () => {
 
     console.log('Categories created:', categories.length);
 
-    // Create tags
     const tags = await Tag.create([
       { name: 'Halal Economy', color: '#A68B5C', createdBy: admin._id },
       { name: 'Finance', color: '#3D8F6F', createdBy: admin._id },
